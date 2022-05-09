@@ -17,7 +17,7 @@ def fun3():
     print(varsentido.get())
 
 w=tk.Tk()
-w.geometry('300x200')
+w.geometry('600x400')
 w.config(bg='black')
 w.title('Radio Button')
 l1=tk.Label(w, text='GUI', bg='blue', fg='red').pack()
