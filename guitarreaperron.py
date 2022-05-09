@@ -72,4 +72,6 @@ sentido=tk.IntVar()
 izquierda=tk.Radiobutton(w, text='Izquierda', bg='pink', variable=sentido, value=1, command=motordc, width=20, font=('Arial',15)).place(x=350, y=200)
 derecha=tk.Radiobutton(w, text='Derecha', bg='hot pink', variable=sentido, value=2, command=motordc, width=20, font=('Arial',15)).place(x=350, y=400)
 
+#SERVO
+#lservo=tk.Label(w, 
 w.mainloop()
