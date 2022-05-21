@@ -1,6 +1,22 @@
 #Para poder utilizar esta GUI es necesario tener PILLOW y TKINTER, salu3
 import tkinter as tk
 from PIL import ImageTk, Image
+import RPi.GPIO as GPIO
+import time
+#PINES
+servo=32
+trig=11
+echo=13
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(trig, GPIO.OUT)
+GPIO.setup(echo, GPIO.OUT)
+
+
+
+def ultrasonico():
+    pass
+
 
 def manualmode():
     if (manualonoff.get()==1):
