@@ -3,8 +3,8 @@ import time
 import tkinter as tk
 
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(19, GPIO.OUT)
-pwmservo=GPIO.PWM(19,100)
+GPIO.setup(32, GPIO.OUT)
+pwmservo=GPIO.PWM(32,100)
 pwmservo.start(0)
 
 def grados(angulo):

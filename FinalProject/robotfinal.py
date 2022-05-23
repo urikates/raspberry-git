@@ -1,20 +1,8 @@
-#Checar si es correcta la actualizacion de la distancia con un objeto
-#Agregar los encoders y la modificacion de la distancia recorrida
-#Agregar candados para modo manual y auto
-
-
-
 #Para poder utilizar esta GUI es necesario tener PILLOW y TKINTER, salu3
 import tkinter as tk
 from PIL import ImageTk, Image
 import RPi.GPIO as GPIO
 import time
-
-#global distancia, distanciai, distanciad, vueltas,
-contador=0
-encoder=0
-smotori=0
-vueltas=0
 
 #PINES
 servo=32
@@ -22,7 +10,10 @@ trig=11
 echo=13
 motori=(3,5,7)
 motord=(8,10,12)
-encoders=(40, 18)
+
+start=0
+end=0
+contador=0
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(trig, GPIO.OUT)
@@ -30,19 +21,12 @@ GPIO.setup(echo, GPIO.OUT)
 GPIO.setup(servo, GPIO.OUT)
 GPIO.setup(motori, GPIO.OUT)
 GPIO.setup(motord, GPIO.OUT)
-GPIO.setup(encoders, GPIO. IN)
 
 #PWMs
 pwmservo=GPIO.PWM(servo, 100)
 pwmservo.start(14)
 pwmmotori=GPIO.PWM(5, 100)
 pwmmotord=GPIO.PWM(10, 100)
-
-# def grados(angulo):
-#     duty=float(angulo)/10.0+2
-#     pwmservo.ChangeDutyCycle(duty)
-#     print(str(duty))
-
 
 def ultrasonico():
     #Funciòn que nos da la distancia con un objeto por medio del sensor ultrasònico
@@ -51,68 +35,46 @@ def ultrasonico():
     GPIO.output(trig, 1)
     time.sleep(0.000012)
     GPIO.output(trig, 0)
-    
     if GPIO.input(echo)==0:
+        global start
         start=time.time()
-    
     if GPIO.input(echo)==1:
+        global end
         end=time.time()
-    
     tiempo=end-start
     tiemposeg=tiempo*17150
     distancia=round(tiemposeg, 2)
-    distobjlb.config(text='Distance to object (cm)= '+str(distancia))
-    
-def distancia():
-    global contador, vueltas
-#     distrecorlb.config(text='Distance traveled (cm)= '+str(contador))
-    if(smotori==1):
-        if (GPIO.input(40)==0):
-            contador=contador
-        else:
-            contador=contador+1.17
-            contador=round(contador, 2)
-            print(str(contador))
-    w.after(1, distancia)
-    
+    distobjlb.config(text='Distance to object (cm)= '+str(distancia))      
 
 def mode():
     if (onoff.get()==1):
         print('Automode on')
-        autofun()
+        #autofun()
     elif (onoff.get()==2):
         print('Manual mode on')
-        ultrasonico()
         
 def autofun():
-    global contador
-    if(onoff.get()==1):
-        contador=contador+1
-        print(str(contador))
-#         ultrasonico()
-#         if (distancia>30):
-#             forwardauto()
-#         else:
-#             stopauto()
-#             pwmservo.ChangeDutyCycle(15.5)
-#             ultrasonico()
-#             distanciad=distancia
-#             pwmservo.ChangeDutyCycle(6.5)
-#             ultrasonico()
-#             distanciai=distancia
-#             if (distanciai>distanciad):
-#                 leftauto()
-#                 time.sleep(2)
-#                 stop()
-#             elif (distanciai<distanciad):
-#                 rightauto()
-#                 time.sleep(2)
-#                 stopauto()
-    w.after(1000, autofun)
-#
-            
+    ultrasonico()
+    if (distancia>30):
+        forwardauto()
+    else:
+        stopauto()
+        pwmservo.ChangeDutyCycle(15.5)
+        ultrasonico()
+        distanciad=distancia
+        pwmservo.ChangeDutyCycle(6.5)
+        ultrasonico()
+        distanciai=distancia
+        if (distanciai>distanciad):
+            leftauto()
+            time.sleep(2)
+            stop()
+        elif (distanciai<distanciad):
+            rightauto()
+            time.sleep(2)
+            stopauto()
+    w.after(300, autofun)
 
-    
 def forwardauto():
         print('Going Forward')
         GPIO.output(3, True)
@@ -133,7 +95,6 @@ def forwardmanual():
         GPIO.output(8, True)
         GPIO.output(12, False)
         pwmmotord.ChangeDutyCycle(100)
-        distancia()
 
 def backwardauto():
     print('Going Backward')
@@ -251,9 +212,9 @@ leftimg=ImageTk.PhotoImage(leftimage)
 leftbutton=tk.Button(w, image=leftimg, bg='white', relief=tk.RAISED, command=leftmanual).place(x=90, y=190)
 
 #Modo automatico
-onautobutton=tk.Radiobutton(w, text='On', bg='#ffff1a', relief=tk.GROOVE, command=mode, variable=onoff, value=1, font=('Arial', 25)).place(x=800, y=70)
+onautobutton=tk.Radiobutton(w, text='On', bg='#ffff1a', relief=tk.GROOVE, command=mode, variable=onoff, value=1, font=('Arial', 25)).place(x=680, y=70)
 
-distrecorlb=tk.Label(w, text='Distance traveled (cm)= 00', bg='#2B3856', fg='white', font=('Arial',22)).place(x=550, y=170)
-distobjlb=tk.Label(w, text='Distance to object (cm)= 00', bg='#2B3856', fg='white', font=('Arial',22)).place(x=550, y=250)
+distobjlb=tk.Label(w, text='Distance to object (cm)= 00', bg='#2B3856', fg='white', font=('Arial',22))
+distobjlb.place(x=550, y=200)
 
 w.mainloop()
