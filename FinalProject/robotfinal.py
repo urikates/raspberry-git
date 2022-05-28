@@ -24,7 +24,7 @@ GPIO.setup(motord, GPIO.OUT)
 
 #PWMs
 pwmservo=GPIO.PWM(servo, 100)
-pwmservo.start(14)
+pwmservo.start(12)
 pwmmotori=GPIO.PWM(5, 100)
 pwmmotord=GPIO.PWM(10, 100)
 
@@ -37,51 +37,65 @@ def ultrasonico():
     time.sleep(0.000012)
     GPIO.output(trig, 0)
     print('antes')
-    #start=0
-#end=0
+    global start
+    global end
     while GPIO.input(echo)==0:
         print('despues')
         print(GPIO.input(echo))
         start=time.time()
+        if GPIO.input(echo)==1:
+            break
     while GPIO.input(echo)==1:
         end=time.time()
         print('end')
+        if GPIO.input(echo)==0:
+            break
+        
     tiempo=end-start
     tiemposeg=tiempo*17150
     distancia=round(tiemposeg, 2)
     distobjlb.config(text='Distance to object (cm)= '+str(distancia))
-    w.after(300,ultrasonico)
+    #w.after(300,ultrasonico)
     return distancia
 
 def mode():
     if (onoff.get()==1):
         print('Automode on')
-        #autofun()
+        autofun()
     elif (onoff.get()==2):
         print('Manual mode on')
         
 def autofun():
-    #ultra=ultrasonico()
-    print(str(ultra))
-    if (ultra>15):
-        forwardauto()
-#     else:
-#         stopauto()
-#         pwmservo.ChangeDutyCycle(8)
-#         i=ultrasonico()
-#         time.sleep(3)
-#         pwmservo.ChangeDutyCycle(20)
-#         d=ultrasonico()
-#         time.sleep(3)
-#         if (i>d):
-#             leftauto()
-#             time.sleep(2)
-#             stopauto()
-#         elif (distanciai<distanciad):
-#             rightauto()
-#             time.sleep(2)
-#             stopauto()
-    w.after(300, autofun)
+    #Valores de servo, para carrito Trokita
+    if (onoff.get()==1):
+        pwmservo.ChangeDutyCycle(12)
+        time.sleep(0.5)
+        ultra=ultrasonico()
+        print(str(ultra))
+        if (ultra>30):
+            forwardauto()
+        else:
+            stopauto()
+            time.sleep(0.3)
+            pwmservo.ChangeDutyCycle(18)
+            time.sleep(0.5)
+            i=ultrasonico()
+            time.sleep(0.1)
+            pwmservo.ChangeDutyCycle(6)
+            time.sleep(0.5)
+            d=ultrasonico()
+            time.sleep(0.1)
+            if (i>d):
+                leftauto()
+                time.sleep(0.5)
+                stopauto()
+            elif (i<d):
+                rightauto()
+                time.sleep(0.5)
+                stopauto()
+        w.after(300, autofun)
+    else:
+        distobjlb.config(text='Distance to object (cm)= 00')
 
 def forwardauto():
         print('Going Forward')
@@ -225,6 +239,6 @@ onautobutton=tk.Radiobutton(w, text='On', bg='#ffff1a', relief=tk.GROOVE, comman
 distobjlb=tk.Label(w, text='Distance to object (cm)= 00', bg='#2B3856', fg='white', font=('Arial',22))
 distobjlb.place(x=550, y=200)
 
-u=ultrasonico()
-print(u)
+#u=ultrasonico()
+#print(u)
 w.mainloop()
